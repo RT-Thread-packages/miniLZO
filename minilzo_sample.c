@@ -47,7 +47,7 @@
 #define DCOMPRESS_BUFFER_SIZE          4096
 
 /*  we must provide a little more output space in case that compression is not possible */
-#define COMPRESS_BUFFER_PADDING        (COMPRESS_BUFFER_SIZE / 16 + 64 + 3)
+#define BUFFER_PADDING        MINILZO_BUFFER_PADDING(COMPRESS_BUFFER_SIZE)
 
 static int minilzo_compress_file(int fd_in, int fd_out)
 {
@@ -65,7 +65,7 @@ static int minilzo_compress_file(int fd_in, int fd_out)
     file_size = lseek(fd_in, 0, SEEK_END);
     lseek(fd_in, 0, SEEK_SET);
 
-    cmprs_buffer = (rt_uint8_t *) malloc(COMPRESS_BUFFER_SIZE + COMPRESS_BUFFER_PADDING);
+    cmprs_buffer = (rt_uint8_t *) malloc(COMPRESS_BUFFER_SIZE + BUFFER_PADDING);
     buffer = (rt_uint8_t *) malloc(COMPRESS_BUFFER_SIZE);
     if (!cmprs_buffer || !buffer)
     {
@@ -87,7 +87,7 @@ static int minilzo_compress_file(int fd_in, int fd_out)
         }
         
         memset(buffer, 0x00, COMPRESS_BUFFER_SIZE);
-        memset(cmprs_buffer, 0x00, COMPRESS_BUFFER_SIZE + COMPRESS_BUFFER_PADDING);
+        memset(cmprs_buffer, 0x00, COMPRESS_BUFFER_SIZE + BUFFER_PADDING);
 
         read(fd_in, buffer, block_size);
 
@@ -155,7 +155,7 @@ static int minilzo_decompress_file(int fd_in, int fd_out)
     }
 
     dcmprs_buffer = (rt_uint8_t *) malloc(DCOMPRESS_BUFFER_SIZE);
-    buffer = (rt_uint8_t *) malloc(DCOMPRESS_BUFFER_SIZE + COMPRESS_BUFFER_PADDING);
+    buffer = (rt_uint8_t *) malloc(DCOMPRESS_BUFFER_SIZE + BUFFER_PADDING);
     if (!dcmprs_buffer || !buffer)
     {
         rt_kprintf("[minilzo] No memory for dcmprs_buffer or buffer!\n");
@@ -170,7 +170,7 @@ static int minilzo_decompress_file(int fd_in, int fd_out)
         read(fd_in, buffer_hdr, BLOCK_HEADER_SIZE);
         block_size = buffer_hdr[0] * (1 << 24) + buffer_hdr[1] * (1 << 16) + buffer_hdr[2] * (1 << 8) + buffer_hdr[3];
 
-        memset(buffer, 0x00, COMPRESS_BUFFER_SIZE + COMPRESS_BUFFER_PADDING);
+        memset(buffer, 0x00, COMPRESS_BUFFER_SIZE + BUFFER_PADDING);
         memset(dcmprs_buffer, 0x00, DCOMPRESS_BUFFER_SIZE);
 
         read(fd_in, buffer, block_size);

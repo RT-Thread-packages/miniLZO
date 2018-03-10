@@ -33,9 +33,12 @@
 
 
 #ifndef __MINILZO_H_INCLUDED
-#define __MINILZO_H_INCLUDED 1
+#define __MINILZO_H_INCLUDED           1
 
-#define MINILZO_VERSION         0x20a0  /* 2.10 */
+#define MINILZO_VERSION                0x20a0  /* 2.10 */
+
+/*  we must provide a little more output space in case that compression is not possible */
+#define MINILZO_BUFFER_PADDING(x)      ((x) / 16 + 64 + 3)
 
 #if defined(__LZOCONF_H_INCLUDED)
 #  error "you cannot use both LZO and miniLZO"
